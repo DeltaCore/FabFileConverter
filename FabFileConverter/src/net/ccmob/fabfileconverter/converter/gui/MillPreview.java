@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 
 import javax.swing.JPanel;
 
@@ -45,6 +46,7 @@ public class MillPreview extends JPanel {
 	@Override
 	public void paint(Graphics g) {
 		g2 = (Graphics2D) g;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		for (int i = 0; i < this.getConverter().getFiles().size(); i++) {
 			for (int t = 0; t < this.getConverter().getFiles().get(i).getTools().size(); t++) {
 				for (int p = 0; p < this.getConverter().getFiles().get(i).getCoords().size(); p++) {
