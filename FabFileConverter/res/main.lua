@@ -1,0 +1,5 @@
+require 'math'
+require 'io'
+require 'res/nativelib'
+require 'res/const'
+require 'res/drl'
