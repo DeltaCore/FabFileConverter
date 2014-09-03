@@ -62,3 +62,11 @@ function Class(name)
 	self.className = name
 	return self
 end
+
+function RGB(r,g,b)
+	local color = Class("color")
+	color.r = r
+	color.g = g
+	color.b = b
+	return color
+end

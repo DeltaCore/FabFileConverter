@@ -65,7 +65,7 @@ public class CoreGui extends JFrame implements ActionListener{
 		mntmExportFile.addActionListener(this);
 		mnFile.add(mntmExportFile);
 
-		mntmShowPreview.setActionCommand("preview");
+		mntmShowPreview.setActionCommand("show");
 		mntmShowPreview.addActionListener(this);
 		mnFile.add(mntmShowPreview);
 		
@@ -73,13 +73,13 @@ public class CoreGui extends JFrame implements ActionListener{
 		SpringLayout springLayout = new SpringLayout();
 		getContentPane().setLayout(springLayout);
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPane,
-				10, SpringLayout.NORTH, getContentPane());
-		springLayout.putConstraint(SpringLayout.WEST, scrollPane, 10,
+				0, SpringLayout.NORTH, getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, scrollPane, 0,
 				SpringLayout.WEST, getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane,
-				-10, SpringLayout.SOUTH, getContentPane());
+				0, SpringLayout.SOUTH, getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, scrollPane,
-				-10, SpringLayout.EAST, getContentPane());
+				0, SpringLayout.EAST, getContentPane());
 		
 		getContentPane().add(scrollPane);
 		txtrPreviewTextfield.setText("");
@@ -107,6 +107,14 @@ public class CoreGui extends JFrame implements ActionListener{
 				return null;
 			}
 			
+		});
+		globals.set("SYS_textAreaScrollTop", new ZeroArgFunction() {
+			
+			@Override
+			public LuaValue call() {
+				txtrPreviewTextfield.select(0, 0);
+				return null;
+			}
 		});
 		globals.loadfile("res/main.lua").call();
 		
@@ -176,7 +184,7 @@ public class CoreGui extends JFrame implements ActionListener{
 							if(f != null){
 								f.read(currentFile);
 								CoreGui.txtrPreviewTextfield.setText("");
-								f.peview();
+								f.preview();
 							}else{
 								CoreGui.txtrPreviewTextfield.setText("Could not find any converter for this file type.");
 							}
@@ -195,8 +203,172 @@ public class CoreGui extends JFrame implements ActionListener{
 				}
 				break;
 			}
+			case "show":{
+				FabricationFileConverter f = CoreGui.checkFileEnd(currentFile);
+				if(f != null){
+					f.show();
+				}else{
+					CoreGui.txtrPreviewTextfield.setText("Could not find any converter for this file type.");
+				}
+				break;
+			}
 			default:
 				break;
 		}
+	}
+
+	/**
+	 * @param menuBar the menuBar to set
+	 */
+	public void setMenuBar(JMenuBar menuBar) {
+		this.menuBar = menuBar;
+	}
+
+	/**
+	 * @return the mnFile
+	 */
+	public JMenu getMnFile() {
+		return mnFile;
+	}
+
+	/**
+	 * @param mnFile the mnFile to set
+	 */
+	public void setMnFile(JMenu mnFile) {
+		this.mnFile = mnFile;
+	}
+
+	/**
+	 * @return the mntmLoadFile
+	 */
+	public JMenuItem getMntmLoadFile() {
+		return mntmLoadFile;
+	}
+
+	/**
+	 * @param mntmLoadFile the mntmLoadFile to set
+	 */
+	public void setMntmLoadFile(JMenuItem mntmLoadFile) {
+		this.mntmLoadFile = mntmLoadFile;
+	}
+
+	/**
+	 * @return the mntmExportFile
+	 */
+	public JMenuItem getMntmExportFile() {
+		return mntmExportFile;
+	}
+
+	/**
+	 * @param mntmExportFile the mntmExportFile to set
+	 */
+	public void setMntmExportFile(JMenuItem mntmExportFile) {
+		this.mntmExportFile = mntmExportFile;
+	}
+
+	/**
+	 * @return the mntmShowPreview
+	 */
+	public JMenuItem getMntmShowPreview() {
+		return mntmShowPreview;
+	}
+
+	/**
+	 * @param mntmShowPreview the mntmShowPreview to set
+	 */
+	public void setMntmShowPreview(JMenuItem mntmShowPreview) {
+		this.mntmShowPreview = mntmShowPreview;
+	}
+
+	/**
+	 * @return the mntmSearchForUpdates
+	 */
+	public JMenuItem getMntmSearchForUpdates() {
+		return mntmSearchForUpdates;
+	}
+
+	/**
+	 * @param mntmSearchForUpdates the mntmSearchForUpdates to set
+	 */
+	public void setMntmSearchForUpdates(JMenuItem mntmSearchForUpdates) {
+		this.mntmSearchForUpdates = mntmSearchForUpdates;
+	}
+
+	/**
+	 * @return the txtrPreviewTextfield
+	 */
+	public static JTextArea getTxtrPreviewTextfield() {
+		return txtrPreviewTextfield;
+	}
+
+	/**
+	 * @param txtrPreviewTextfield the txtrPreviewTextfield to set
+	 */
+	public static void setTxtrPreviewTextfield(JTextArea txtrPreviewTextfield) {
+		CoreGui.txtrPreviewTextfield = txtrPreviewTextfield;
+	}
+
+	/**
+	 * @return the scrollPane
+	 */
+	public JScrollPane getScrollPane() {
+		return scrollPane;
+	}
+
+	/**
+	 * @param scrollPane the scrollPane to set
+	 */
+	public void setScrollPane(JScrollPane scrollPane) {
+		this.scrollPane = scrollPane;
+	}
+
+	/**
+	 * @return the currentFile
+	 */
+	public String getCurrentFile() {
+		return currentFile;
+	}
+
+	/**
+	 * @param currentFile the currentFile to set
+	 */
+	public void setCurrentFile(String currentFile) {
+		this.currentFile = currentFile;
+	}
+
+	/**
+	 * @return the fabFileConverter
+	 */
+	public static ArrayList<FabricationFileConverter> getFabFileConverter() {
+		return fabFileConverter;
+	}
+
+	/**
+	 * @param fabFileConverter the fabFileConverter to set
+	 */
+	public static void setFabFileConverter(
+			ArrayList<FabricationFileConverter> fabFileConverter) {
+		CoreGui.fabFileConverter = fabFileConverter;
+	}
+
+	/**
+	 * @return the globals
+	 */
+	public Globals getGlobals() {
+		return globals;
+	}
+
+	/**
+	 * @param globals the globals to set
+	 */
+	public void setGlobals(Globals globals) {
+		this.globals = globals;
+	}
+
+	/**
+	 * @return the serialversionuid
+	 */
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 }

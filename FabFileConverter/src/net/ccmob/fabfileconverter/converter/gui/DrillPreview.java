@@ -92,9 +92,9 @@ public class DrillPreview extends JPanel {
 
 		float xScale = width / (bX + sX);
 		float yScale = height / (bY + sY);
-
+		
 		scale = 0.0F;
-
+		
 		if (xScale > yScale) {
 			scale = yScale;
 		} else if (yScale > xScale) {
@@ -162,7 +162,6 @@ public class DrillPreview extends JPanel {
 
 	@Override
 	public void setBounds(int x, int y, int width, int height) {
-		// TODO Auto-generated method stub
 		super.setBounds(x, y, width, height);
 		if (!calc) {
 			calcOneTime();

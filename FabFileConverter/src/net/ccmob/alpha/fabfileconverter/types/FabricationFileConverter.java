@@ -17,7 +17,7 @@ public abstract class FabricationFileConverter {
 
 	public abstract void read(String fileName);
 
-	public abstract void peview();
+	public abstract void preview();
 
 	public abstract void show();
 

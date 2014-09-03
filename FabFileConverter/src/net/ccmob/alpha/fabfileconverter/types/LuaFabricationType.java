@@ -6,9 +6,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import net.ccmob.alpha.fabfileconverter.FabFileConverterCore;
+import net.ccmob.alpha.fabfileconverter.LuaFrame;
+
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
 public class LuaFabricationType extends FabricationFileConverter {
@@ -21,16 +25,20 @@ public class LuaFabricationType extends FabricationFileConverter {
 
 	private FileWriter writer;
 
-	public LuaFabricationType(String name, String regex, String newEnding,Globals lGlobals) {
+	private LuaFrame frame;
+
+	public LuaFabricationType(String name, String regex, String newEnding,
+			Globals lGlobals) {
 		super(name, regex, newEnding);
 		convert = lGlobals.get(name + "_convert");
 		read = lGlobals.get(name + "_read");
 		preview = lGlobals.get(name + "_preview");
 		show = lGlobals.get(name + "_show");
-		
+
 		lGlobals.set(name + "_openFile", new LStartFile(this));
 		lGlobals.set(name + "_writeLine", new LWriteLine(this));
 		lGlobals.set(name + "_closeFile", new LEndFile(this));
+		lGlobals.set(name + "_requestFrame", new LRequestFrame(this));
 	}
 
 	@Override
@@ -58,7 +66,7 @@ public class LuaFabricationType extends FabricationFileConverter {
 	}
 
 	@Override
-	public void peview() {
+	public void preview() {
 		preview.call();
 	}
 
@@ -79,17 +87,17 @@ public class LuaFabricationType extends FabricationFileConverter {
 		@Override
 		public LuaValue call() {
 			f = new File(converter.nFile);
-			if(f.exists()){
+			if (f.exists()) {
 				f.delete();
 			}
-			if(converter.writer != null){
+			if (converter.writer != null) {
 				try {
 					writer.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			if(converter.nFile.isEmpty()){
+			if (converter.nFile.isEmpty()) {
 				System.err.println("No file selected");
 				return LuaValue.valueOf("No File selected");
 			}
@@ -113,13 +121,13 @@ public class LuaFabricationType extends FabricationFileConverter {
 
 		@Override
 		public LuaValue call() {
-			if(converter.writer != null){
+			if (converter.writer != null) {
 				try {
 					converter.writer.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}else{
+			} else {
 				return LuaValue.valueOf("Stream not open.");
 			}
 			return null;
@@ -137,15 +145,34 @@ public class LuaFabricationType extends FabricationFileConverter {
 
 		@Override
 		public LuaValue call(LuaValue line) {
-			if(converter.writer != null){
+			if (converter.writer != null) {
 				try {
-					converter.writer.write(line.toString() + String.format("%n"));
+					converter.writer.write(line.toString()
+							+ String.format("%n"));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}else{
+			} else {
 				return LuaValue.valueOf("Stream not open.");
 			}
+			return null;
+		}
+
+	}
+
+	private class LRequestFrame extends ThreeArgFunction {
+
+		private LuaFabricationType converter;
+
+		public LRequestFrame(LuaFabricationType conv) {
+			this.converter = conv;
+		}
+
+		@Override
+		public LuaValue call(LuaValue renderFunc, LuaValue resizeFunction,
+				LuaValue windowName) {			
+			converter.frame = new LuaFrame(renderFunc, resizeFunction, converter.getName(),
+					windowName.toString());
 			return null;
 		}
 
