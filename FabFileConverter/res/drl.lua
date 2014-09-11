@@ -117,8 +117,8 @@ function drl_frame_resize(width,height)
 
 end
 
-function Tool(format, size, index, sSize)
-	if format and size then
+function Tool(format, size, index, sSize) --sSize is the size written in the file so for example: "0.0300"
+	if format and size and index and sSize then
 		local tool = Class("Tool")
 		tool.format = format
 		tool.size = size
@@ -126,7 +126,7 @@ function Tool(format, size, index, sSize)
 		tool.sSize = sSize
 		return tool
 	else
-		error("No format and/or size defined")
+		error("No format and/or size and/or index and/or sSize defined")
 		return nil
 	end
 end
