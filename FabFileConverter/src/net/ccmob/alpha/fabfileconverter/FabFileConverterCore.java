@@ -7,6 +7,7 @@ public class FabFileConverterCore {
 	public static CoreGui coreGuiInstance;
 	
 	public static void main(String[] args) {
+		
 		natives();
 		coreGuiInstance = new CoreGui();
 	}

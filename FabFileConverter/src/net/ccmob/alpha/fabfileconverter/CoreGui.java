@@ -1,6 +1,7 @@
 package net.ccmob.alpha.fabfileconverter;
 
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -16,6 +17,7 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 import javax.swing.filechooser.FileFilter;
 
+import net.ccmob.alpha.fabfileconverter.config.Config;
 import net.ccmob.alpha.fabfileconverter.types.FabricationFileConverter;
 import net.ccmob.alpha.fabfileconverter.types.LuaFabricationType;
 
@@ -26,7 +28,7 @@ import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
-public class CoreGui extends JFrame implements ActionListener{
+public class CoreGui extends JFrame implements ActionListener {
 
 	JMenuBar menuBar = new JMenuBar();
 	JMenu mnFile = new JMenu("File");
@@ -36,19 +38,20 @@ public class CoreGui extends JFrame implements ActionListener{
 	JMenuItem mntmSearchForUpdates = new JMenuItem("Search for updates");
 	static JTextArea txtrPreviewTextfield = new JTextArea();
 	JScrollPane scrollPane = new JScrollPane();
-	
+	private Config config = new Config("config.cfg");
+
 	String currentFile = "";
-	
+
 	public static ArrayList<FabricationFileConverter> fabFileConverter = new ArrayList<FabricationFileConverter>();
-	
+
 	/**
 	 * 
 	 * Lua support:
 	 * 
 	 */
-	
+
 	private Globals globals = JsePlatform.standardGlobals();
-	
+
 	public CoreGui() {
 		setTitle("Fabrication file converter");
 		this.setSize(500, 300);
@@ -56,7 +59,7 @@ public class CoreGui extends JFrame implements ActionListener{
 		setJMenuBar(menuBar);
 
 		menuBar.add(mnFile);
-		
+
 		mntmLoadFile.setActionCommand("loadFile");
 		mntmLoadFile.addActionListener(this);
 		mnFile.add(mntmLoadFile);
@@ -68,28 +71,30 @@ public class CoreGui extends JFrame implements ActionListener{
 		mntmShowPreview.setActionCommand("show");
 		mntmShowPreview.addActionListener(this);
 		mnFile.add(mntmShowPreview);
-		
+
 		mnFile.add(mntmSearchForUpdates);
 		SpringLayout springLayout = new SpringLayout();
 		getContentPane().setLayout(springLayout);
-		springLayout.putConstraint(SpringLayout.NORTH, scrollPane,
-				0, SpringLayout.NORTH, getContentPane());
+		springLayout.putConstraint(SpringLayout.NORTH, scrollPane, 0,
+				SpringLayout.NORTH, getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, scrollPane, 0,
 				SpringLayout.WEST, getContentPane());
-		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane,
-				0, SpringLayout.SOUTH, getContentPane());
-		springLayout.putConstraint(SpringLayout.EAST, scrollPane,
-				0, SpringLayout.EAST, getContentPane());
-		
+		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane, 0,
+				SpringLayout.SOUTH, getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, scrollPane, 0,
+				SpringLayout.EAST, getContentPane());
+
 		getContentPane().add(scrollPane);
 		txtrPreviewTextfield.setText("");
-		
+
 		scrollPane.setViewportView(txtrPreviewTextfield);
 		System.out.println("Loading lua converters ...");
-		globals.set("SYS_createConverter", new ThreeArgFunction(){
+		globals.set("SYS_createConverter", new ThreeArgFunction() {
 			@Override
-			public LuaValue call(LuaValue name, LuaValue regex, LuaValue newEnding) {
-				addConverter(new LuaFabricationType(name.toString(), regex.toString(), newEnding.toString(), globals));
+			public LuaValue call(LuaValue name, LuaValue regex,
+					LuaValue newEnding) {
+				addConverter(new LuaFabricationType(name.toString(), regex
+						.toString(), newEnding.toString(), globals));
 				return null;
 			}
 		});
@@ -100,16 +105,17 @@ public class CoreGui extends JFrame implements ActionListener{
 				return null;
 			}
 		});
-		globals.set("SYS_textAreaAddLine", new OneArgFunction(){
+		globals.set("SYS_textAreaAddLine", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue line) {
-				txtrPreviewTextfield.append(line.toString() + String.format("%n"));
+				txtrPreviewTextfield.append(line.toString()
+						+ String.format("%n"));
 				return null;
 			}
-			
+
 		});
 		globals.set("SYS_textAreaScrollTop", new ZeroArgFunction() {
-			
+
 			@Override
 			public LuaValue call() {
 				txtrPreviewTextfield.select(0, 0);
@@ -117,41 +123,43 @@ public class CoreGui extends JFrame implements ActionListener{
 			}
 		});
 		globals.loadfile("res/main.lua").call();
-		
+
 		System.out.println("Done.");
-		for(FabricationFileConverter c : fabFileConverter){
+		for (FabricationFileConverter c : fabFileConverter) {
 			System.out.println(c);
 		}
 		this.setVisible(true);
 	}
-	
-	public void addConverter(FabricationFileConverter c){
-		if(!fabFileConverter.contains(c)){
+
+	public void addConverter(FabricationFileConverter c) {
+		if (!fabFileConverter.contains(c)) {
 			fabFileConverter.add(c);
 		}
 	}
 
 	public static boolean checkFileEndBoolean(String fileEnd) {
 		for (FabricationFileConverter c : fabFileConverter) {
-			if(c.checkFileEnd(fileEnd)){
+			if (c.checkFileEnd(fileEnd)) {
 				return true;
 			}
 		}
 		System.out.println("failed - lols :/");
 		return false;
 	}
-	
-	public static FabricationFileConverter checkFileEnd(String fileEnd) { // XXX main -
+
+	public static FabricationFileConverter checkFileEnd(String fileEnd) { // XXX
+																			// main
+																			// -
 		// checkFileEnd : Working
 		for (FabricationFileConverter c : fabFileConverter) {
-			if(c.checkFileEnd(fileEnd)){
+			if (c.checkFileEnd(fileEnd)) {
 				return c;
 			}
 		}
 		System.out.println("failed BLUBAS");
 		return null;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -159,66 +167,110 @@ public class CoreGui extends JFrame implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		switch(e.getActionCommand()){
-			case "loadFile":{
-				if(fabFileConverter.size() > 0){
-					
-					JFileChooser filedialog = new JFileChooser(System.getProperty("user.home"));
-						filedialog.setFileFilter(new FileFilter() {
+		switch (e.getActionCommand()) {
+		case "loadFile": {
+			if (fabFileConverter.size() > 0) {
+				this.getConfig().addDefault("lastFolderpath",
+						System.getProperty("user.home"));
+				this.getConfig().save();
 
-							@Override
-							public boolean accept(File f) {
-								return f.isDirectory() || CoreGui.checkFileEndBoolean(f.getName());
-							}
+				FileDialog filedialog = new FileDialog(this,
+						"Select your fabrication file", FileDialog.LOAD);
+				filedialog.setDirectory(this.getConfig().getValue(
+						"lastFolderpath"));
+				String files = "";
+				for (int i = 0; i < fabFileConverter.size(); i++) {
+					if (i - 1 == fabFileConverter.size())
+						files += "*." + fabFileConverter.get(i).getName();
+					else
+						files += "*." + fabFileConverter.get(i).getName()
+								+ " | ";
 
-							@Override
-							public String getDescription() {
-								return "Fabrication files (.gm/g(1-8) | .drl)";
-							}
+				}
+				filedialog.setFile(files);
+				filedialog.setVisible(true);
+				if (filedialog.getFile() == null)
+					System.out.println("You cancelled the choice");
+				else {
+					String filename = filedialog.getDirectory()
+							+ (!filedialog.getDirectory().endsWith(
+									File.separator) ? File.separator
+									: "") + filedialog.getFile();
+					System.out.println(filename);
+					this.currentFile = new File(filename).getAbsolutePath();
+					this.getConfig().setValue("lastFolderpath", currentFile);
+					this.getConfig().save();
+					FabricationFileConverter f = CoreGui
+							.checkFileEnd(currentFile);
+					if (f != null) {
+						f.read(currentFile);
+						CoreGui.txtrPreviewTextfield.setText("");
+						f.preview();
+					} else {
+						CoreGui.txtrPreviewTextfield
+								.setText("Could not find any converter for this file type.");
+					}
+				}
 
-						});
-						int state = filedialog.showOpenDialog(null);
-						if (state == JFileChooser.APPROVE_OPTION) {
-							this.currentFile = filedialog.getSelectedFile().getAbsolutePath();
-							FabricationFileConverter f = CoreGui.checkFileEnd(currentFile);
-							if(f != null){
-								f.read(currentFile);
-								CoreGui.txtrPreviewTextfield.setText("");
-								f.preview();
-							}else{
-								CoreGui.txtrPreviewTextfield.setText("Could not find any converter for this file type.");
-							}
-						}
-				}else{
-					System.err.println("Please check your installation. No converters found.");
-				}
-				break;
+				/*
+				 * JFileChooser filedialog = new
+				 * JFileChooser(this.getConfig().getValue("lastFolderpath"));
+				 * filedialog.setFileFilter(new FileFilter() {
+				 * 
+				 * @Override public boolean accept(File f) { return
+				 * f.isDirectory() || CoreGui.checkFileEndBoolean(f.getName());
+				 * }
+				 * 
+				 * @Override public String getDescription() { return
+				 * "Fabrication files (.gm/g(1-8) | .drl)"; }
+				 * 
+				 * }); int state = filedialog.showOpenDialog(null); if (state ==
+				 * JFileChooser.APPROVE_OPTION) { this.currentFile =
+				 * filedialog.getSelectedFile().getAbsolutePath();
+				 * this.getConfig().setValue("lastFolderpath", currentFile);
+				 * this.getConfig().save(); FabricationFileConverter f =
+				 * CoreGui.checkFileEnd(currentFile); if(f != null){
+				 * f.read(currentFile);
+				 * CoreGui.txtrPreviewTextfield.setText(""); f.preview(); }else{
+				 * CoreGui.txtrPreviewTextfield.setText(
+				 * "Could not find any converter for this file type."); } }
+				 */
+			} else {
+				System.err
+						.println("Please check your installation. No converters found.");
 			}
-			case "exportFile":{
-				FabricationFileConverter f = CoreGui.checkFileEnd(currentFile);
-				if(f != null){
-					f.convert(this.currentFile.substring(0, this.currentFile.lastIndexOf(".")) + "." + f.getConvertedFileEnding());
-				}else{
-					CoreGui.txtrPreviewTextfield.setText("Could not find any converter for this file type.");
-				}
-				break;
+			break;
+		}
+		case "exportFile": {
+			FabricationFileConverter f = CoreGui.checkFileEnd(currentFile);
+			if (f != null) {
+				f.convert(this.currentFile.substring(0,
+						this.currentFile.lastIndexOf("."))
+						+ "." + f.getConvertedFileEnding());
+			} else {
+				CoreGui.txtrPreviewTextfield
+						.setText("Could not find any converter for this file type.");
 			}
-			case "show":{
-				FabricationFileConverter f = CoreGui.checkFileEnd(currentFile);
-				if(f != null){
-					f.show();
-				}else{
-					CoreGui.txtrPreviewTextfield.setText("Could not find any converter for this file type.");
-				}
-				break;
+			break;
+		}
+		case "show": {
+			FabricationFileConverter f = CoreGui.checkFileEnd(currentFile);
+			if (f != null) {
+				f.show();
+			} else {
+				CoreGui.txtrPreviewTextfield
+						.setText("Could not find any converter for this file type.");
 			}
-			default:
-				break;
+			break;
+		}
+		default:
+			break;
 		}
 	}
 
 	/**
-	 * @param menuBar the menuBar to set
+	 * @param menuBar
+	 *            the menuBar to set
 	 */
 	public void setMenuBar(JMenuBar menuBar) {
 		this.menuBar = menuBar;
@@ -232,7 +284,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param mnFile the mnFile to set
+	 * @param mnFile
+	 *            the mnFile to set
 	 */
 	public void setMnFile(JMenu mnFile) {
 		this.mnFile = mnFile;
@@ -246,7 +299,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param mntmLoadFile the mntmLoadFile to set
+	 * @param mntmLoadFile
+	 *            the mntmLoadFile to set
 	 */
 	public void setMntmLoadFile(JMenuItem mntmLoadFile) {
 		this.mntmLoadFile = mntmLoadFile;
@@ -260,7 +314,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param mntmExportFile the mntmExportFile to set
+	 * @param mntmExportFile
+	 *            the mntmExportFile to set
 	 */
 	public void setMntmExportFile(JMenuItem mntmExportFile) {
 		this.mntmExportFile = mntmExportFile;
@@ -274,7 +329,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param mntmShowPreview the mntmShowPreview to set
+	 * @param mntmShowPreview
+	 *            the mntmShowPreview to set
 	 */
 	public void setMntmShowPreview(JMenuItem mntmShowPreview) {
 		this.mntmShowPreview = mntmShowPreview;
@@ -288,7 +344,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param mntmSearchForUpdates the mntmSearchForUpdates to set
+	 * @param mntmSearchForUpdates
+	 *            the mntmSearchForUpdates to set
 	 */
 	public void setMntmSearchForUpdates(JMenuItem mntmSearchForUpdates) {
 		this.mntmSearchForUpdates = mntmSearchForUpdates;
@@ -302,7 +359,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param txtrPreviewTextfield the txtrPreviewTextfield to set
+	 * @param txtrPreviewTextfield
+	 *            the txtrPreviewTextfield to set
 	 */
 	public static void setTxtrPreviewTextfield(JTextArea txtrPreviewTextfield) {
 		CoreGui.txtrPreviewTextfield = txtrPreviewTextfield;
@@ -316,7 +374,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param scrollPane the scrollPane to set
+	 * @param scrollPane
+	 *            the scrollPane to set
 	 */
 	public void setScrollPane(JScrollPane scrollPane) {
 		this.scrollPane = scrollPane;
@@ -330,7 +389,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param currentFile the currentFile to set
+	 * @param currentFile
+	 *            the currentFile to set
 	 */
 	public void setCurrentFile(String currentFile) {
 		this.currentFile = currentFile;
@@ -344,7 +404,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param fabFileConverter the fabFileConverter to set
+	 * @param fabFileConverter
+	 *            the fabFileConverter to set
 	 */
 	public static void setFabFileConverter(
 			ArrayList<FabricationFileConverter> fabFileConverter) {
@@ -359,7 +420,8 @@ public class CoreGui extends JFrame implements ActionListener{
 	}
 
 	/**
-	 * @param globals the globals to set
+	 * @param globals
+	 *            the globals to set
 	 */
 	public void setGlobals(Globals globals) {
 		this.globals = globals;
@@ -370,5 +432,20 @@ public class CoreGui extends JFrame implements ActionListener{
 	 */
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	/**
+	 * @return the config
+	 */
+	public Config getConfig() {
+		return config;
+	}
+
+	/**
+	 * @param config
+	 *            the config to set
+	 */
+	public void setConfig(Config config) {
+		this.config = config;
 	}
 }

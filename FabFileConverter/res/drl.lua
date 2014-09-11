@@ -189,7 +189,6 @@ function drl_parseLine(line)
 		drl_points[#drl_points + 1] = Point(last.x,y,drl_tools[currentTool])
 	elseif(string.match(line, toolMatch)) then
 		local tNum, tSize = string.match(line, toolMatch)
-		print(tNum, " ", tSize)
 		drl_tools[tonumber(tNum)] = Tool(currentFormat, tonumber(tSize), tNum, tSize)
 	elseif(string.match(line, formatMatch)) then
 		local formatType, mode = string.match(line, formatMatch)
@@ -207,6 +206,14 @@ function drl_parseLine(line)
 end
 
 function drl_read(content, fileName)
+	drl_lines = {}
+	drl_tools = {}
+	drl_points = {}
+	last = {}
+	last.x = 0
+	last.y = 0
+	currentTool = nil
+	multForMinor = 2
 	drl_fileName = fileName
 	local tbl = split(content, "\n")
 	for _,line in pairs(tbl) do
