@@ -6,8 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -15,17 +17,19 @@ import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
-import javax.swing.filechooser.FileFilter;
 
 import net.ccmob.alpha.fabfileconverter.config.Config;
 import net.ccmob.alpha.fabfileconverter.types.FabricationFileConverter;
 import net.ccmob.alpha.fabfileconverter.types.LuaFabricationType;
 
 import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaString;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
+import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 public class CoreGui extends JFrame implements ActionListener {
@@ -50,14 +54,14 @@ public class CoreGui extends JFrame implements ActionListener {
 	 * 
 	 */
 
-	private Globals globals = JsePlatform.standardGlobals();
+	Globals globals = JsePlatform.standardGlobals();
 
-	public CoreGui() {
+	public CoreGui(String[] commandArgs) {
 		setTitle("Fabrication file converter");
 		this.setSize(500, 300);
 		this.setPreferredSize(new Dimension(500, 300));
 		setJMenuBar(menuBar);
-
+		
 		menuBar.add(mnFile);
 
 		mntmLoadFile.setActionCommand("loadFile");
@@ -88,47 +92,28 @@ public class CoreGui extends JFrame implements ActionListener {
 		txtrPreviewTextfield.setText("");
 
 		scrollPane.setViewportView(txtrPreviewTextfield);
-		System.out.println("Loading lua converters ...");
-		globals.set("SYS_createConverter", new ThreeArgFunction() {
-			@Override
-			public LuaValue call(LuaValue name, LuaValue regex,
-					LuaValue newEnding) {
-				addConverter(new LuaFabricationType(name.toString(), regex
-						.toString(), newEnding.toString(), globals));
-				return null;
-			}
-		});
-		globals.set("SYS_clearTextArea", new ZeroArgFunction() {
-			@Override
-			public LuaValue call() {
-				txtrPreviewTextfield.setText("");
-				return null;
-			}
-		});
-		globals.set("SYS_textAreaAddLine", new OneArgFunction() {
-			@Override
-			public LuaValue call(LuaValue line) {
-				txtrPreviewTextfield.append(line.toString()
-						+ String.format("%n"));
-				return null;
-			}
-
-		});
-		globals.set("SYS_textAreaScrollTop", new ZeroArgFunction() {
-
-			@Override
-			public LuaValue call() {
-				txtrPreviewTextfield.select(0, 0);
-				return null;
-			}
-		});
-		globals.loadfile("res/main.lua").call();
-
+		
+		Lua.loadModule(this);
+		
 		System.out.println("Done.");
-		for (FabricationFileConverter c : fabFileConverter) {
-			System.out.println(c);
-		}
 		this.setVisible(true);
+		if(commandArgs.length == 1){
+			String filename = commandArgs[0];
+			System.out.println(filename);
+			this.currentFile = new File(filename).getAbsolutePath();
+			this.getConfig().setValue("lastFolderpath", currentFile);
+			this.getConfig().save();
+			FabricationFileConverter f = CoreGui
+					.checkFileEnd(currentFile);
+			if (f != null) {
+				f.read(currentFile);
+				CoreGui.txtrPreviewTextfield.setText("");
+				f.preview();
+			} else {
+				CoreGui.txtrPreviewTextfield
+						.setText("Could not find any converter for this file type.");
+			}
+		}
 	}
 
 	public void addConverter(FabricationFileConverter c) {

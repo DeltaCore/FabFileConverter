@@ -6,16 +6,16 @@ function addColor(rgb)
 	drl_tool_colors[#drl_tool_colors + 1] = rgb
 end
 
-addColor(RGB(255,0,0))
-addColor(RGB(0,255,0))
-addColor(RGB(0,0,255))
-addColor(RGB(255,255,0))
-addColor(RGB(0,255,255))
-addColor(RGB(255,0,255))
-addColor(RGB(255,255,255))
+addColor(Colors.RGB(255,0,0))
+addColor(Colors.RGB(0,255,0))
+addColor(Colors.RGB(0,0,255))
+addColor(Colors.RGB(255,255,0))
+addColor(Colors.RGB(0,255,255))
+addColor(Colors.RGB(255,0,255))
+addColor(Colors.RGB(255,255,255))
 
 function drl_g_drawArc(x,y,diameter,rgb)
-	drl_setXY(x,y)
+	drl_setXY(x ,y)
 	drl_setRGB(rgb.r,rgb.g,rgb.b)
 	drl_drawArc(diameter)
 end
@@ -101,15 +101,17 @@ function drl_frame_render()
 	local lastY = 0
 	local toolSize = 0
 	for index, point in pairs(drl_points) do
-		toolSize = point.tool.size * (math.pow(10,multForMinor)) * scale
+		toolSize = (point.tool.size * (math.pow(10,multForMinor))) * scale
+		local x = (point.x * scale) - (toolSize)
+		local y = (point.y * scale) - (toolSize)
 		if #drl_tool_colors < tonumber(point.tool.index) then
-			drl_g_drawArc((point.x * scale) - (toolSize / 2), (point.y * scale) - (toolSize / 2), toolSize, RGB(255,255,255))
+			drl_g_drawArc(x, y, toolSize, RGB(255,255,255))
 		else
-			drl_g_drawArc((point.x * scale) - (toolSize / 2), (point.y * scale) - (toolSize / 2), toolSize, drl_tool_colors[point.tool.index])
+			drl_g_drawArc(x, y, toolSize, drl_tool_colors[point.tool.index])
 		end
-		drl_g_drawLine(lastX, lastY, (point.x * scale) - (toolSize / 2) * scale, (point.y * scale) - (toolSize / 2) * scale, RGB(255,255,255))
-		lastX = (point.x * scale) - (toolSize / 2) * scale
-		lastY = (point.y * scale) - (toolSize / 2) * scale
+		drl_g_drawLine(lastX, lastY, x, y, RGB(255,255,255))
+		lastX = x
+		lastY = y
 	end
 end
 
@@ -119,7 +121,7 @@ end
 
 function Tool(format, size, index, sSize) --sSize is the size written in the file so for example: "0.0300"
 	if format and size and index and sSize then
-		local tool = Class("Tool")
+		local tool = Sys.Class("Tool")
 		tool.format = format
 		tool.size = size
 		tool.index = tonumber(index)
@@ -133,7 +135,7 @@ end
 
 function Point(x,y,t)
 	if x and y and t then
-		local point = Class("Point")
+		local point = Sys.Class("Point")
 		point.x = tonumber(x)
 		point.y = tonumber(y)
 		point.tool = t
@@ -205,7 +207,8 @@ function drl_parseLine(line)
 	end
 end
 
-function drl_read(content, fileName)
+function drl_read(content, rawFileName, fileEnding)
+	fileName = rawFileName .. "." .. fileEnding
 	drl_lines = {}
 	drl_tools = {}
 	drl_points = {}
@@ -215,7 +218,7 @@ function drl_read(content, fileName)
 	currentTool = nil
 	multForMinor = 2
 	drl_fileName = fileName
-	local tbl = split(content, "\n")
+	local tbl = string.split(content, "\n")
 	for _,line in pairs(tbl) do
 		drl_lines[#drl_lines + 1] = line
 		drl_parseLine(line)
@@ -247,9 +250,10 @@ function drl_show()
 		drl_requestFrame("drl_frame_render", "drl_frame_resize", "Drill preview")
 		drl_frame_setVisible(true)
 		drl_frame_update()
+	else
+		drl_frame_setVisible(true)
+		drl_frame_update()
 	end
 end
 
-RegisterConverter("drl", "^[dL][rR][lL]$", "ock")
-
-
+Sys.RegisterConverter("drl", "^[dD][rR][lL]$", "txt")

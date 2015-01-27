@@ -5,12 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
-import net.ccmob.alpha.fabfileconverter.FabFileConverterCore;
 import net.ccmob.alpha.fabfileconverter.LuaFrame;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
@@ -50,6 +51,9 @@ public class LuaFabricationType extends FabricationFileConverter {
 	@Override
 	public void read(String fName) {
 		String lines = "";
+		String rawName = fName.substring(0, fName.lastIndexOf('.'));
+		String ending = fName.substring(fName.lastIndexOf('.') + 1);
+		System.out.println(ending);
 		BufferedReader reader;
 		try {
 			reader = new BufferedReader(new FileReader(new File(fName)));
@@ -61,8 +65,8 @@ public class LuaFabricationType extends FabricationFileConverter {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
-		}
-		read.call(LuaValue.valueOf(lines), LuaValue.valueOf(fName));
+		}	
+		read.call(LuaValue.valueOf(lines),LuaValue.valueOf(rawName),LuaValue.valueOf(ending));
 	}
 
 	@Override
@@ -176,6 +180,83 @@ public class LuaFabricationType extends FabricationFileConverter {
 			return null;
 		}
 
+	}
+	
+	private class MultiVar extends Varargs {
+
+		private ArrayList<LuaValue> args;
+		
+		public MultiVar(ArrayList<LuaValue> args) {
+			this.setArgs(args);
+		}
+		
+		public MultiVar() {
+			this.setArgs(new ArrayList<LuaValue>());
+		}
+		
+		@Override
+		public LuaValue arg(int i) {
+			if(i < this.getArgs().size())
+				return this.getArgs().get(i);
+			return null;
+		}
+
+		@Override
+		public LuaValue arg1() {
+			if(this.getArgs().size() > 0)
+				return this.getArgs().get(0);
+			return null;
+		}
+
+		@Override
+		public int narg() {
+			return this.getArgs().size();
+		}
+
+		@Override
+		public Varargs subargs(int index) {
+			ArrayList<LuaValue> values = new ArrayList<LuaValue>();
+			for(int i = index;i<this.getArgs().size();i++)
+				values.add(this.getArgs().get(i));
+			return new MultiVar(values);
+		}
+
+		/**
+		 * @return the args
+		 */
+		public ArrayList<LuaValue> getArgs() {
+			return args;
+		}
+
+		/**
+		 * @param args the args to set
+		 */
+		public void setArgs(ArrayList<LuaValue> args) {
+			this.args = args;
+		}
+		
+		/**
+		 * @param str the String to add to the lua args stack
+		 */
+		
+		public void add(String str){
+			this.getArgs().add(LuaValue.valueOf(str));
+		}
+		
+		/**
+		 * @param i the integer to add to the lua args stack
+		 */
+		
+		public void add(int i){
+			this.getArgs().add(LuaValue.valueOf(i));
+		}
+		
+		@Override
+		protected void finalize() throws Throwable {
+			super.finalize();
+			this.getArgs().clear();
+		}
+		
 	}
 
 }

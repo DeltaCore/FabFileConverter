@@ -1,5 +1,6 @@
 package net.ccmob.alpha.fabfileconverter;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -29,7 +30,7 @@ public class LuaFrame extends JFrame {
 	private String moduleName;
 	private Graphics2D graphics;
 
-	private int x = 0, y = 0, r = 0, g = 0, b = 0;
+	private int x = 0, y = 0, r = 0, g = 0, b = 0, t = 0;
 
 	public LuaFrame(LuaValue render, LuaValue resize, String moduleName,
 			String windowName) {
@@ -105,6 +106,7 @@ public class LuaFrame extends JFrame {
 	public void loadGR2D(Globals g) {
 		g.set(this.moduleName + "_setXY", new setXY(this));
 		g.set(this.moduleName + "_setRGB", new setRGB(this));
+		g.set(this.moduleName + "_setLineThickness", new setLineThickness(this));
 		g.set(this.moduleName + "_drawArc", new drawArc(this));
 		g.set(this.moduleName + "_drawLine", new drawLine(this));
 		g.set(this.moduleName + "_drawRect", new drawRect(this));
@@ -148,6 +150,22 @@ public class LuaFrame extends JFrame {
 		}
 	}
 
+	private class setLineThickness extends OneArgFunction {
+		
+		private LuaFrame frame;
+		
+		public setLineThickness(LuaFrame c){
+			this.frame = c;
+		}
+		
+		@Override
+		public LuaValue call(LuaValue i){
+			frame.graphics.setStroke(new BasicStroke((float) i.checkdouble(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			return null;
+		}
+		
+	}
+	
 	private class drawArc extends OneArgFunction {
 
 		private LuaFrame frame;
@@ -159,7 +177,7 @@ public class LuaFrame extends JFrame {
 		@Override
 		public LuaValue call(LuaValue rad) {
 			frame.graphics.setColor(new Color(frame.r, frame.g, frame.b));
-			frame.graphics.fillArc(frame.x, frame.y, rad.checkint(),
+			frame.graphics.fillArc(frame.x - (rad.checkint() / 2), frame.y - (rad.checkint() / 2), rad.checkint(),
 					rad.checkint(), 0, 360);
 			return null;
 		}
