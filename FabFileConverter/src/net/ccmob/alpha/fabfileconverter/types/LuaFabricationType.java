@@ -5,13 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import net.ccmob.alpha.fabfileconverter.LuaFrame;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
@@ -77,6 +75,14 @@ public class LuaFabricationType extends FabricationFileConverter {
 	@Override
 	public void show() {
 		show.call();
+	}
+
+	public LuaFrame getFrame() {
+		return frame;
+	}
+
+	public void setFrame(LuaFrame frame) {
+		this.frame = frame;
 	}
 
 	private class LStartFile extends ZeroArgFunction {
@@ -175,88 +181,11 @@ public class LuaFabricationType extends FabricationFileConverter {
 		@Override
 		public LuaValue call(LuaValue renderFunc, LuaValue resizeFunction,
 				LuaValue windowName) {			
-			converter.frame = new LuaFrame(renderFunc, resizeFunction, converter.getName(),
-					windowName.toString());
+			converter.setFrame(new LuaFrame(renderFunc, resizeFunction, converter.getName(),
+					windowName.toString()));
 			return null;
 		}
 
-	}
-	
-	private class MultiVar extends Varargs {
-
-		private ArrayList<LuaValue> args;
-		
-		public MultiVar(ArrayList<LuaValue> args) {
-			this.setArgs(args);
-		}
-		
-		public MultiVar() {
-			this.setArgs(new ArrayList<LuaValue>());
-		}
-		
-		@Override
-		public LuaValue arg(int i) {
-			if(i < this.getArgs().size())
-				return this.getArgs().get(i);
-			return null;
-		}
-
-		@Override
-		public LuaValue arg1() {
-			if(this.getArgs().size() > 0)
-				return this.getArgs().get(0);
-			return null;
-		}
-
-		@Override
-		public int narg() {
-			return this.getArgs().size();
-		}
-
-		@Override
-		public Varargs subargs(int index) {
-			ArrayList<LuaValue> values = new ArrayList<LuaValue>();
-			for(int i = index;i<this.getArgs().size();i++)
-				values.add(this.getArgs().get(i));
-			return new MultiVar(values);
-		}
-
-		/**
-		 * @return the args
-		 */
-		public ArrayList<LuaValue> getArgs() {
-			return args;
-		}
-
-		/**
-		 * @param args the args to set
-		 */
-		public void setArgs(ArrayList<LuaValue> args) {
-			this.args = args;
-		}
-		
-		/**
-		 * @param str the String to add to the lua args stack
-		 */
-		
-		public void add(String str){
-			this.getArgs().add(LuaValue.valueOf(str));
-		}
-		
-		/**
-		 * @param i the integer to add to the lua args stack
-		 */
-		
-		public void add(int i){
-			this.getArgs().add(LuaValue.valueOf(i));
-		}
-		
-		@Override
-		protected void finalize() throws Throwable {
-			super.finalize();
-			this.getArgs().clear();
-		}
-		
 	}
 
 }

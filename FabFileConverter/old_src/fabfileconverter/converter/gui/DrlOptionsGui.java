@@ -106,7 +106,7 @@ public class DrlOptionsGui extends JFrame {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			String cmd = e.getActionCommand();
+			//String cmd = e.getActionCommand();
 			for(ConvertOption o : this.gui.options){
 				if(e.equals("option_" + o.toString().toLowerCase().replace(" ", "_"))){
 					if(this.gui.activeOptions.contains(o))

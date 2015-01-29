@@ -6,6 +6,10 @@ function addColor(rgb)
 	gm_tool_colors[#gm_tool_colors + 1] = rgb
 end
 
+function addTool(t)
+	gm_tools[#gm_tools + 1] = t
+end
+
 addColor(Colors.RGB(255,0,0))
 addColor(Colors.RGB(0,255,0))
 addColor(Colors.RGB(0,0,255))
@@ -147,15 +151,61 @@ function GMPoint(x,y,t, penState)
 	end
 end
 
-function gm_convert()
-	local tIndex = 0
-	for index, point in pairs(gm_points) do
-		if #gm_tools[tIndex] then
-
+function gm_is_point_last_in_tool(tIndex, pIndex)
+	local flagP = false
+	for index, point in ipairs(gm_points) do
+		if index == pIndex then
+			flagP = true
 		else
-			tIndex = tIndex + 1
+			if flagP then
+				if point.tool.index == gm_tools[tIndex].index then
+					return false
+				end
+			end
 		end
 	end
+	return true
+end
+
+function gm_convert()
+	print("Tools: ")
+	gm_openFile()
+	gm_writeLine("PA;")
+	local lastState = -1
+	for tIndex = 1, #gm_tools do
+		gm_writeLine("PU;SP" .. tostring(tIndex) .. ";")
+		for index, point in ipairs(gm_points) do
+			if point.tool.index == gm_tools[tIndex].index then
+				-- correct tool
+				local line = ""
+				print(point.penState .. " - " .. PenPos.PD .. " - " .. PenPos.PD)
+				if tonumber(point.penState) == PenPos.PD then
+					print("PD")
+					line = line .. "PD"
+				else
+					print("PU")
+					line = line .. "PU"
+				end
+				line = line .. point.x .. "," .. point.y .. ";"
+				if gm_points[index + 1] then
+					if gm_points[index + 1].tool.index == gm_tools[tIndex].index then
+						if tonumber(gm_points[index + 1].penState) ~= tonumber(point.penState) then
+							if tonumber(gm_points[index + 1].penState) == PenPos.PD then
+								print("PD;")
+								line = line .. "PD;"
+							else
+								print("PU;")
+								line = line .. "PU;"
+							end
+						end
+					end
+				end
+				gm_writeLine(line)
+			end
+		end
+	end
+	gm_writeLine("PU;")
+	gm_closeFile()
 end
 
 local rXYd					= "[xX]([-0-9]{1,})[yY]([-0-9]{1,})[dD][0]([1-2])[*]";
@@ -185,6 +235,7 @@ last.ps = 0
 function gm_parseLine(line)
 	if string.matchRegex(rXYd, line) ~= nil then
 		local groups = string.matchRegex(rXYd, line)
+		term.print_r(groups)
 		if #groups == 3 then
 			local x = groups[1]
 			last.x = x
@@ -199,6 +250,7 @@ function gm_parseLine(line)
 		end
 	elseif string.matchRegex(rXd, line) ~= nil then
 		local groups = string.matchRegex(rXd, line)
+		term.print_r(groups)
 		if #groups == 2 then
 			local x = groups[1]
 			last.x = x
@@ -212,6 +264,7 @@ function gm_parseLine(line)
 		end
 	elseif string.matchRegex(rYd, line) ~= nil then
 		local groups = string.matchRegex(rYd, line)
+		term.print_r(groups)
 		if #groups == 2 then
 			local x = last.x
 			local y = groups[1]
@@ -265,7 +318,7 @@ function gm_parseLine(line)
 		if #groups == 2 then
 			local index = tonumber(groups[1]) - 10
 			local size = groups[2]
-			gm_tools[tonumber(index)] = Tool(Formats["Inch"], tonumber(size), index, size)
+			addTool(Tool(Formats["Inch"], tonumber(size), index, size))
 		else
 			print("Error in args for rTool - needed length 2: ")
 			term.print_r(groups, "groups")

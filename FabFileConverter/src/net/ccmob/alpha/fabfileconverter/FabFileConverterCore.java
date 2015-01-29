@@ -1,6 +1,7 @@
 package net.ccmob.alpha.fabfileconverter;
 
-import net.ccmob.fabfileconverter.FabFileConverter.FabFileConverter;
+import net.ccmob.alpha.fabfileconverter.natives.MacOSX;
+import net.ccmob.alpha.fabfileconverter.natives.NativeHandler;
 
 public class FabFileConverterCore {
 
@@ -11,12 +12,14 @@ public class FabFileConverterCore {
 		coreGuiInstance = new CoreGui(args);
 	}
 	
+	public static final NativeHandler[]	nativeHandler	= new NativeHandler[] { new MacOSX("OS X") };
+	
 	private static void natives(){
 		String osName = System.getProperty("os.name");
-		for (int i = 0; i < FabFileConverter.nativeHandler.length; i++) {
-			if (osName.contains(FabFileConverter.nativeHandler[i].getOsName())) {
-				System.out.println(FabFileConverter.nativeHandler[i].getOsName() + " deteced. Running Native handler for this system.");
-				FabFileConverter.nativeHandler[i].setupSystemProperties();
+		for (int i = 0; i < nativeHandler.length; i++) {
+			if (osName.contains(nativeHandler[i].getOsName())) {
+				System.out.println(nativeHandler[i].getOsName() + " deteced. Running Native handler for this system.");
+				nativeHandler[i].setupSystemProperties();
 			}
 		}
 	}

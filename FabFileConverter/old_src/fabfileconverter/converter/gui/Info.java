@@ -1,6 +1,5 @@
 package net.ccmob.fabfileconverter.converter.gui;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -11,11 +10,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import net.ccmob.fabfileconverter.converter.SettingsReader;
 import net.ccmob.fabfileconverter.FabFileConverter.Core;
 
 public class Info extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel					contentPane;
 	private ButtonListener	listener;
 

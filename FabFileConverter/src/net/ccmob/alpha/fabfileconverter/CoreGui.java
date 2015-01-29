@@ -6,9 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -20,16 +17,8 @@ import javax.swing.SpringLayout;
 
 import net.ccmob.alpha.fabfileconverter.config.Config;
 import net.ccmob.alpha.fabfileconverter.types.FabricationFileConverter;
-import net.ccmob.alpha.fabfileconverter.types.LuaFabricationType;
 
 import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaString;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.OneArgFunction;
-import org.luaj.vm2.lib.ThreeArgFunction;
-import org.luaj.vm2.lib.TwoArgFunction;
-import org.luaj.vm2.lib.ZeroArgFunction;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 public class CoreGui extends JFrame implements ActionListener {
@@ -58,6 +47,7 @@ public class CoreGui extends JFrame implements ActionListener {
 
 	public CoreGui(String[] commandArgs) {
 		setTitle("Fabrication file converter");
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setSize(500, 300);
 		this.setPreferredSize(new Dimension(500, 300));
 		setJMenuBar(menuBar);

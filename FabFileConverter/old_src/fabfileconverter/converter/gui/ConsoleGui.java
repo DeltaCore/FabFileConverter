@@ -10,6 +10,10 @@ import javax.swing.border.EmptyBorder;
 
 public class ConsoleGui extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel	 contentPane;
 	public JTextArea	txtrLog	= new JTextArea();
 

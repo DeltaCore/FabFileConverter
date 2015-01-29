@@ -167,8 +167,7 @@ public class Core implements Runnable {
 				System.out.println("[Plugin-Manager] Loading Jars ...");
 			} catch (Exception e) {
 				System.out.println("Sorry , Something went wrong with the debug console");
-				JOptionPane box = new JOptionPane("Sorry , Something went wrong with the debug console");
-				box.show();
+				JOptionPane.showMessageDialog(null, "Sorry , Something went wrong with the debug console");
 			}
 		}
 	}

@@ -9,6 +9,11 @@ import net.ccmob.fabfileconverter.converter.reader.DrlConverter;
 public class DrlGuiView extends JFrame {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Create the frame.
 	 * 
 	 * @param yOrigin

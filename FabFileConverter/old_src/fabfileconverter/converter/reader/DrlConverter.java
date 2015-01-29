@@ -85,9 +85,10 @@ public class DrlConverter extends FabricationTypeConverter {
 						i++;
 					}
 				}
+				int c = i;
 				writer.write("%" + nLine);
 				writer.write(fTool + nLine);
-				for (i = i; i < fileLength; i++) {
+				for (i = c; i < fileLength; i++) {
 					if (points.get(i) != null) {
 						Point p = points.get(i);
 						if (p.getX() == -1) {
@@ -139,8 +140,9 @@ public class DrlConverter extends FabricationTypeConverter {
 						i++;
 					}
 				}
+				int c = i;
 				writer.write("%" + nLine);
-				for (i = i; i < fileLength; i++) {
+				for (i = c; i < fileLength; i++) {
 					if (tools[i] != null) {
 						writer.write("T" + checkNulls(tools[i].getIndex(), 2) + nLine);
 					} else if (points.get(i) != null) {

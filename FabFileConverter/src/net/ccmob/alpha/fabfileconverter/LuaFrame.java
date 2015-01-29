@@ -30,7 +30,7 @@ public class LuaFrame extends JFrame {
 	private String moduleName;
 	private Graphics2D graphics;
 
-	private int x = 0, y = 0, r = 0, g = 0, b = 0, t = 0;
+	private int x = 0, y = 0, r = 0, g = 0, b = 0;
 
 	public LuaFrame(LuaValue render, LuaValue resize, String moduleName,
 			String windowName) {

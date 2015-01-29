@@ -12,11 +12,11 @@ public class PluginHandler {
 	static Core	core;
 
 	public PluginHandler(Core c) {
-		this.core = c;
+		core = c;
 	}
 
 	public void loadJars() {
-		String pathSeperator = System.getProperty("file.separator");
+		//String pathSeperator = System.getProperty("file.separator");
 		File folder = new File(getApplicationPath() + "plugins");
 		if (!folder.exists())
 			folder.mkdir();
@@ -29,10 +29,11 @@ public class PluginHandler {
 
 	public void loadJarFile(File f) {
 		try {
-			URL url = f.toURL();
+			URL url = new URL(f.getAbsolutePath());
 			URL[] urls = new URL[] { url };
-			ClassLoader cLoader = new URLClassLoader(urls);
+			URLClassLoader cLoader = new URLClassLoader(urls);
 			Class<?> c = cLoader.loadClass("FabFilePlugin.MainClass");
+			cLoader.close();
 			c.newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -42,7 +43,7 @@ public class PluginHandler {
 	public String getApplicationPath() {
 		String sep = File.separator;
 		String osName = System.getProperty("os.name");
-		String path = System.getProperty("file.separator");
+		//String path = System.getProperty("file.separator");
 		String programPath = System.getenv("ProgramFiles");
 		if (osName.equalsIgnoreCase("Mac OS X")) {
 			File f = new File(sep + "Applications" + sep + "FabFileConverter" + sep);

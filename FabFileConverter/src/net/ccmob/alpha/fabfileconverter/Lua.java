@@ -28,14 +28,14 @@ public class Lua {
 		c.globals.set("SYS_clearTextArea", new ZeroArgFunction() {
 			@Override
 			public LuaValue call() {
-				c.txtrPreviewTextfield.setText("");
+				CoreGui.txtrPreviewTextfield.setText("");
 				return null;
 			}
 		});
 		c.globals.set("SYS_textAreaAddLine", new OneArgFunction() {
 			@Override
 			public LuaValue call(LuaValue line) {
-				c.txtrPreviewTextfield.append(line.toString()
+				CoreGui.txtrPreviewTextfield.append(line.toString()
 						+ String.format("%n"));
 				return null;
 			}
@@ -45,7 +45,7 @@ public class Lua {
 
 			@Override
 			public LuaValue call() {
-				c.txtrPreviewTextfield.select(0, 0);
+				CoreGui.txtrPreviewTextfield.select(0, 0);
 				return null;
 			}
 		});

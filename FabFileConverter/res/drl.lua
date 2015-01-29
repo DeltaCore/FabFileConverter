@@ -105,11 +105,11 @@ function drl_frame_render()
 		local x = (point.x * scale) - (toolSize)
 		local y = (point.y * scale) - (toolSize)
 		if #drl_tool_colors < tonumber(point.tool.index) then
-			drl_g_drawArc(x, y, toolSize, RGB(255,255,255))
+			drl_g_drawArc(x, y, toolSize, Colors.RGB(255,255,255))
 		else
 			drl_g_drawArc(x, y, toolSize, drl_tool_colors[point.tool.index])
 		end
-		drl_g_drawLine(lastX, lastY, x, y, RGB(255,255,255))
+		drl_g_drawLine(lastX, lastY, x, y, Colors.RGB(255,255,255))
 		lastX = x
 		lastY = y
 	end
@@ -168,7 +168,15 @@ function drl_convert()
 			drl_writeLine("T" .. i .. point.tool.index)
 			currentTool = point.tool
 		end
-		drl_writeLine("X" .. point.x .. "Y" .. point.y)
+		local x = tonumber(point.x)
+		local y = tonumber(point.y)
+		if x < 100 then
+			x = "0" .. x
+		end
+		if y < 100 then
+			y = "0" .. y
+		end
+		drl_writeLine("X" .. x .. "Y" .. y)
 	end
 	drl_writeLine("M30")
 	drl_closeFile()
