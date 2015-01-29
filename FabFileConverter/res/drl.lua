@@ -176,6 +176,8 @@ function drl_convert()
 		if y < 100 then
 			y = "0" .. y
 		end
+		x = "00" .. x
+		y = "00" .. y
 		drl_writeLine("X" .. x .. "Y" .. y)
 	end
 	drl_writeLine("M30")
