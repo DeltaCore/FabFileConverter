@@ -316,7 +316,7 @@ function gm_parseLine(line)
 	elseif string.matchRegex(rTool, line) ~= nil then
 		local groups = string.matchRegex(rTool, line)
 		if #groups == 2 then
-			local index = tonumber(groups[1]) - 10
+			local index = tonumber(groups[1]) - 9
 			local size = groups[2]
 			addTool(Tool(Formats["Inch"], tonumber(size), index, size))
 		else
@@ -334,7 +334,7 @@ function gm_parseLine(line)
 	elseif string.matchRegex(rToolSelect, line) ~= nil then
 		print("rToolSelect")
 		local groups = string.matchRegex(rToolSelect, line)
-		currentTool = gm_tools[tonumber(groups[1]) - 10]
+		currentTool = gm_tools[tonumber(groups[1]) - 9]
 	end
 end
 
